@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akshat Gupta | AI Innovator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.net.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.globe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.waves.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.fog.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.cells.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.rings.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.dots.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.dots.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.fog.min.js"></script>
+    <style>
+        :root {
+            --primary: #00f0ff;
+            --secondary: #7b2cbf;
+            --dark: #0a0a1a;
+            --light: #e0e6ff;
+        }
+        
+        /* Completely remove scrollbar */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--dark);
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Hide scrollbar for all elements */
+        * {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s ease;
+            z-index: 1;
+            background-color: var(--dark);
+        }
+        
+        .page.active {
+            transform: translateX(0);
+            opacity: 1;
+            z-index: 2;
+        }
+        
+        /* Enable scrolling within active page only */
+        .page.active {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .terminal {
+            background: rgba(10, 10, 26, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .terminal-header {
+            background: rgba(0, 240, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terminal-body {
+            padding: 20px;
+            min-height: 200px;
+        }
+        
+        .command {
+            color: var(--primary);
+        }
+        
+        .response {
+            color: var(--light);
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 20px;
+            background: var(--primary);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 3px;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .project-card {
+            transition: all 0.3s ease;
+            background: rgba(20, 20, 40, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 240, 255, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .skill-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(0, 240, 255, 0.2);
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+        
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-3px);
+            filter: drop-shadow(0 5px 5px rgba(0, 240, 255, 0.3));
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 40px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Loading spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+            border: 3px solid rgba(0, 240, 255, 0.3);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+        }
+        
+        /* Background effects */
+        .vanta-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .content-container {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Skill banners */
+        .skills-banner {
+            position: absolute;
+            white-space: nowrap;
+            will-change: transform;
+            animation: slide 60s linear infinite;
+            font-size: 2rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.05);
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .skills-banner:nth-child(odd) {
+            animation-direction: reverse;
+        }
+        
+        @keyframes slide {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        
+        .skill-banner-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        /* Modern dot pattern for about section */
+        .dot-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: 0;
+        }
+        
+        /* Wave animation for contact section */
+        .wave-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="rgba(0, 240, 255, 0.1)" opacity=".25"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="rgba(0, 240, 255, 0.1)" opacity=".5"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="rgba(0, 240, 255, 0.1)"/></svg>');
+            background-repeat: repeat-x;
+            animation: wave 15s linear infinite;
+        }
+        
+        .wave:nth-child(2) {
+            animation-delay: -5s;
+            animation-duration: 20s;
+            opacity: 0.5;
+        }
+        @media (max-width: 768px) {
+    #navbar {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        background-color: rgba(10, 10, 26, 0.8) !important;
+    }
+    
+    /* Optional: make navbar slightly transparent when not scrolled */
+    #navbar:not(.scrolled) {
+        background-color: rgba(10, 10, 26, 0.7) !important;
+    }
+}
+        .wave:nth-child(3) {
+            animation-delay: -2s;
+            animation-duration: 25s;
+            opacity: 0.3;
+        }
+        /* Add this to your existing CSS */
+.navbar-blur {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(10, 10, 26, 0.7) !important;
+}
+
+/* Ensure mobile menu has proper z-index */
+#mobile-menu {
+    z-index: 50; /* Above the blurred navbar */
+}
+        @keyframes wave {
+            0% { transform: translateX(0) translateZ(0) scaleY(1); }
+            50% { transform: translateX(-25%) translateZ(0) scaleY(0.8); }
+            100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-[#0a0a1a] z-50 flex flex-col items-center justify-center">
+        <div class="loading-spinner w-16 h-16 mb-4"></div>
+        <div class="text-xl font-bold gradient-text">Loading Portfolio...</div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-40 bg-[#0a0a1a]/90 backdrop-blur-md shadow-lg transition-all duration-300">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold gradient-text hidden md:block"> </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#home" class="nav-link text-white hover:text-[#00f0ff] active">Home</a>
+                <a href="#about" class="nav-link text-white hover:text-[#00f0ff]">About</a>
+                <a href="#projects" class="nav-link text-white hover:text-[#00f0ff]">Projects</a>
+                <a href="#skills" class="nav-link text-white hover:text-[#00f0ff]">Skills</a>
+                <a href="#contact" class="nav-link text-white hover:text-[#00f0ff]">Contact</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-white hover:text-[#00f0ff] transition-colors">
+                <i data-feather="menu"></i>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="md:hidden fixed inset-0 bg-[#0a0a1a] z-30 flex flex-col items-center justify-center hidden transition-all duration-300 hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40">
+        <button id="close-mobile-menu" class="absolute top-6 right-6 text-white hover:text-[#00f0ff] transition-colors">
+            <i data-feather="x" class="w-8 h-8"></i>
+        </button>
+        <div class="flex flex-col space-y-8 text-center">
+            <a href="#home" class="text-3xl text-white hover:text-[#00f0ff] transition-colors nav-link">Home</a>
+            <a href="#about" class="text-3xl text-white hover:text-[#00f0ff] transition-colors nav-link">About</a>
+            <a href="#projects" class="text-3xl text-white hover:text-[#00f0ff] transition-colors nav-link">Projects</a>
+            <a href="#skills" class="text-3xl text-white hover:text-[#00f0ff] transition-colors nav-link">Skills</a>
+            <a href="#contact" class="text-3xl text-white hover:text-[#00f0ff] transition-colors nav-link">Contact</a>
+        </div>
+    </div>
+    
+    <!-- Pages -->
+    <div id="pages-container">
+        <!-- Home Page -->
+        <div id="home-page" class="page active">
+            <section id="home" class="section flex items-center justify-center relative">
+                <div id="vanta-home" class="vanta-bg"></div>
+                <div class="container mx-auto px-6 z-10 text-center">
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6 gradient-text animate-float">Akshat Gupta</h1>
+
+                    
+                    <div class="terminal mb-12">
+                        <div class="terminal-header">
+                            <div class="flex space-x-2 mr-4">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="text-sm">terminal</div>
+                        </div>
+                        <div class="terminal-body">
+                            <div id="terminal-content">
+                                <!-- Content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap justify-center gap-4 mt-24">
+                        <a href="#projects" class="page-link px-8 py-3 rounded-full font-bold bg-gradient-to-r from-[#00f0ff] to-[#7b2cbf] text-[#0a0a1a] hover:shadow-lg hover:shadow-[#00f0ff]/30 transition-all">
+                            Explore My Work
+                        </a>
+                        <a href="#contact" class="page-link px-8 py-3 rounded-full font-bold border-2 border-[#00f0ff] text-[#00f0ff] hover:bg-[#00f0ff]/10 transition-all">
+                            Contact Me
+                        </a>
+                    </div>
+                    
+                    <!-- Social Links -->
+                    <div class="mt-16 flex justify-center space-x-6">
+                        <a href="https://github.com/akshatgupta-dev" target="_blank" class="social-icon">
+                            <i data-feather="github" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/akshatgupta01" target="_blank" class="social-icon">
+                            <i data-feather="linkedin" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="mailto:gupta.akshat2005@gmail.com" class="social-icon">
+                            <i data-feather="mail" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- About Page -->
+        <div id="about-page" class="page">
+            <section id="about" class="section relative">
+                <!-- Modern dot pattern background -->
+                <div id="vanta-about" class="vanta-bg"></div>                
+                <div class="container mx-auto px-6 py-12 content-container">
+                    <h2 class="text-4xl font-bold text-center section-title">About Me</h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-12 items-center mt-12">
+                        <div class="flex flex-col space-y-6">
+                            <h3 class="text-2xl font-bold gradient-text">AI Student at SAMK</h3>
+                            <p class="text-lg leading-relaxed">Based in Pori, Satakunta region, I specialize in deep learning, computer vision, and AI-driven applications. My journey in artificial intelligence combines academic rigor with practical implementation to solve real-world problems.</p>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="px-4 py-2 rounded-full text-center bg-[#00f0ff]/10 border border-[#00f0ff]/30">Machine Learning</div>
+                                <div class="px-4 py-2 rounded-full text-center bg-[#00f0ff]/10 border border-[#00f0ff]/30">Computer Vision</div>
+                                <div class="px-4 py-2 rounded-full text-center bg-[#00f0ff]/10 border border-[#00f0ff]/30">Neural Networks</div>
+                                <div class="px-4 py-2 rounded-full text-center bg-[#00f0ff]/10 border border-[#00f0ff]/30">Data Engineering</div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-medium">AI/ML Development</span>
+                                    <span>95%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-medium">Deep Learning</span>
+                                    <span>90%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-medium">Data Analysis</span>
+                                    <span>85%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-medium">Backend Development</span>
+                                    <span>80%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Links -->
+                    <div class="mt-16 flex justify-center space-x-6">
+                        <a href="https://github.com/akshatgupta-dev" target="_blank" class="social-icon">
+                            <i data-feather="github" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/akshatgupta01" target="_blank" class="social-icon">
+                            <i data-feather="linkedin" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="mailto:gupta.akshat2005@gmail.com" class="social-icon">
+                            <i data-feather="mail" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Projects Page -->
+        <div id="projects-page" class="page">
+            <section id="projects" class="section relative">
+                <div id="vanta-projects" class="vanta-bg"></div>                <div class="container mx-auto px-6 py-12 content-container">
+                    <h2 class="text-4xl font-bold text-center section-title">Featured Projects</h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mt-12">
+                        <!-- Project 1 -->
+                        <div class="project-card rounded-xl p-8">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 rounded-full bg-[#00f0ff]/20 flex items-center justify-center mr-4">
+                                    <i data-feather="cpu" class="text-[#00f0ff]"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold gradient-text">AI Pathogen Detector</h3>
+                            </div>
+                            <p class="mb-6">Advanced web application predicting bacterial types and antibiotic resistance from images using deep learning and ResNet-18 architecture.</p>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">PyTorch</span>
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">FastAPI</span>
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">Computer Vision</span>
+                            </div>
+                            <a href="https://lnkd.in/daTdvVFg" target="_blank" class="inline-flex items-center text-[#00f0ff] hover:underline">
+                                View Project <i data-feather="arrow-right" class="ml-2 w-4 h-4"></i>
+                            </a>
+                        </div>
+                        
+                        <!-- Project 2 -->
+                        <div class="project-card rounded-xl p-8">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 rounded-full bg-[#7b2cbf]/20 flex items-center justify-center mr-4">
+                                    <i data-feather="music" class="text-[#7b2cbf]"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold gradient-text">Lyrics Generator AI</h3>
+                            </div>
+                            <p class="mb-6">Machine learning model generating lyrics in styles of popular artists using LSTM networks and natural language processing techniques.</p>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">LSTM</span>
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">TensorFlow</span>
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">NLP</span>
+                            </div>
+                            <a href="https://github.com/akshatgupta-dev/lyrics-generator" target="_blank" class="inline-flex items-center text-[#00f0ff] hover:underline">
+                                View Project <i data-feather="arrow-right" class="ml-2 w-4 h-4"></i>
+                            </a>
+                        </div>
+                        
+                        <!-- Project 3 -->
+                        <div class="project-card rounded-xl p-8">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 rounded-full bg-[#00f0ff]/20 flex items-center justify-center mr-4">
+                                    <i data-feather="film" class="text-[#00f0ff]"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold gradient-text">Movie Recommendation System</h3>
+                            </div>
+                            <p class="mb-6">Personalized movie recommendation engine using collaborative filtering and sentiment analysis of user reviews.</p>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">Python</span>
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">Scikit-learn</span>
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">NLP</span>
+                            </div>
+                            <a href="#" class="inline-flex items-center text-[#00f0ff] hover:underline">
+                                Coming Soon <i data-feather="clock" class="ml-2 w-4 h-4"></i>
+                            </a>
+                        </div>
+                        
+                        <!-- Project 4 -->
+                        <div class="project-card rounded-xl p-8">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 rounded-full bg-[#7b2cbf]/20 flex items-center justify-center mr-4">
+                                    <i data-feather="heart" class="text-[#7b2cbf]"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold gradient-text">Welfare Technology Project</h3>
+                            </div>
+                            <p class="mb-6">Collaborated with Satapsykiatria to enhance residents' living experience using AI-powered assistive technologies.</p>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">AI Solutions</span>
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">Healthcare</span>
+                                <span class="px-3 py-1 rounded-full text-sm bg-[#00f0ff]/10 border border-[#00f0ff]/30">IoT</span>
+                            </div>
+                            <a href="#" class="inline-flex items-center text-[#00f0ff] hover:underline">
+                                Case Study <i data-feather="file-text" class="ml-2 w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-12">
+                        <a href="https://github.com/akshatgupta-dev" target="_blank" class="inline-flex items-center text-[#00f0ff] hover:underline">
+                            View All Projects on GitHub <i data-feather="github" class="ml-2 w-4 h-4"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Social Links -->
+                    <div class="mt-16 flex justify-center space-x-6">
+                        <a href="https://github.com/akshatgupta-dev" target="_blank" class="social-icon">
+                            <i data-feather="github" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/akshatgupta01" target="_blank" class="social-icon">
+                            <i data-feather="linkedin" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="mailto:gupta.akshat2005@gmail.com" class="social-icon">
+                            <i data-feather="mail" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Skills Page -->
+        <div id="skills-page" class="page">
+            <section id="skills" class="section relative">
+                <div id="vanta-skills" class="vanta-bg"></div>                <!-- Skill banners background -->
+                <div class="skill-banner-container">
+                    <div class="skills-banner" style="top: 10%">
+                        Long Short-term Memory (LSTM) • TensorFlow • NumPy • Pandas • PyTorch • Machine Learning • FastAPI • Resnet • Java • Deep Neural Networks (DNN)
+                    </div>
+                    <div class="skills-banner" style="top: 25%">
+                        Recurrent Neural Networks (RNN) • Convolutional Neural Networks (CNN) • Machine Vision • Docker • Natural Language Processing (NLP) • Artificial Intelligence (AI) • Databases • Data Processing
+                    </div>
+                    <div class="skills-banner" style="top: 40%">
+                        HTML • PHP • MySQL • Linux • Business Planning • Public Speaking • Python (Programming Language) • Project Management • Data Science • Cloud Computing
+                    </div>
+                    <div class="skills-banner" style="top: 55%">
+                        Scikit-learn • Keras • OpenCV • Matplotlib • Seaborn • Jupyter Notebooks • Git • REST APIs • Microservices • Big Data
+                    </div>
+                    <div class="skills-banner" style="top: 70%">
+                        Time Series Analysis • Reinforcement Learning • GANs • Transformers • BERT • Data Visualization • SQL • NoSQL • MongoDB • AWS
+                    </div>
+                    <div class="skills-banner" style="top: 85%">
+                        Problem Solving • Critical Thinking • Team Leadership • Agile Methodologies • Research & Development • Technical Writing • Mentoring • Continuous Learning
+                    </div>
+                </div>
+                
+                <div class="container mx-auto px-6 py-12 content-container">
+                    <h2 class="text-4xl font-bold text-center section-title">Technical Skills</h2>
+                    
+                    <div class="grid md:grid-cols-3 gap-8 mt-12">
+                        <!-- AI/ML Skills -->
+                        <div class="bg-[#0a0a1a]/70 border border-[#00f0ff]/20 rounded-xl p-8 backdrop-blur-sm">
+                            <div class="flex items-center mb-6">
+                                <div class="w-10 h-10 rounded-full bg-[#00f0ff]/20 flex items-center justify-center mr-4">
+                                    <i data-feather="activity" class="text-[#00f0ff]"></i>
+                                </div>
+                                <h3 class="text-xl font-bold gradient-text">AI/ML</h3>
+                            </div>
+                            <ul class="space-y-3">
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>PyTorch</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>TensorFlow/Keras</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>Computer Vision</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>Natural Language Processing</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Development Skills -->
+                        <div class="bg-[#0a0a1a]/70 border border-[#00f0ff]/20 rounded-xl p-8 backdrop-blur-sm">
+                            <div class="flex items-center mb-6">
+                                <div class="w-10 h-10 rounded-full bg-[#7b2cbf]/20 flex items-center justify-center mr-4">
+                                    <i data-feather="code" class="text-[#7b2cbf]"></i>
+                                </div>
+                                <h3 class="text-xl font-bold gradient-text">Development</h3>
+                            </div>
+                            <ul class="space-y-3">
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>Python</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>C++</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>JavaScript</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>API Development</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Tools & Technologies -->
+                        <div class="bg-[#0a0a1a]/70 border border-[#00f0ff]/20 rounded-xl p-8 backdrop-blur-sm">
+                            <div class="flex items-center mb-6">
+                                <div class="w-10 h-10 rounded-full bg-[#00f0ff]/20 flex items-center justify-center mr-4">
+                                    <i data-feather="tool" class="text-[#00f0ff]"></i>
+                                </div>
+                                <h3 class="text-xl font-bold gradient-text">Tools & Tech</h3>
+                            </div>
+                            <ul class="space-y-3">
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>Docker</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>Git</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>Linux</span>
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-feather="check" class="text-[#00f0ff] mr-2 w-4 h-4"></i>
+                                    <span>AWS/GCP</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Links -->
+                    <div class="mt-16 flex justify-center space-x-6">
+                        <a href="https://github.com/akshatgupta-dev" target="_blank" class="social-icon">
+                            <i data-feather="github" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/akshatgupta01" target="_blank" class="social-icon">
+                            <i data-feather="linkedin" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="mailto:gupta.akshat2005@gmail.com" class="social-icon">
+                            <i data-feather="mail" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Contact Page -->
+        <div id="contact-page" class="page">
+            <section id="contact" class="section relative">
+                <!-- Wave animation background -->
+                <div id="vanta-contact" class="vanta-bg"></div>
+                
+                <div class="container mx-auto px-6 py-12 content-container">
+                    <h2 class="text-4xl font-bold text-center section-title">Get In Touch</h2>
+                    
+                    <div class="max-w-4xl mx-auto mt-12">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="space-y-6">
+                                <h3 class="text-2xl font-bold gradient-text">Contact Information</h3>
+                                
+                                <div class="space-y-4">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 rounded-full bg-[#00f0ff]/20 flex items-center justify-center mr-4">
+                                            <i data-feather="mail" class="text-[#00f0ff]"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-[#a0a0ff]">Email</p>
+                                            <a href="mailto:gupta.akshat2005@gmail.com" class="text-[#00f0ff] hover:underline">gupta.akshat2005@gmail.com</a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 rounded-full bg-[#7b2cbf]/20 flex items-center justify-center mr-4">
+                                            <i data-feather="phone" class="text-[#7b2cbf]"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-[#a0a0ff]">Phone</p>
+                                            <a href="tel:+358466144791" class="text-[#00f0ff] hover:underline">+358 46 6144791</a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 rounded-full bg-[#7b2cbf]/20 flex items-center justify-center mr-4">
+                                            <i data-feather="linkedin" class="text-[#7b2cbf]"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-[#a0a0ff]">LinkedIn</p>
+                                            <a href="https://www.linkedin.com/in/akshatgupta01" target="_blank" class="text-[#00f0ff] hover:underline">linkedin.com/in/akshatgupta01</a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 rounded-full bg-[#00f0ff]/20 flex items-center justify-center mr-4">
+                                            <i data-feather="github" class="text-[#00f0ff]"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-[#a0a0ff]">GitHub</p>
+                                            <a href="https://github.com/akshatgupta-dev" target="_blank" class="text-[#00f0ff] hover:underline">github.com/akshatgupta-dev</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-8">
+                                    <h4 class="font-bold mb-4">Let's Connect</h4>
+                                    <div class="flex space-x-4">
+                                        <a href="#" class="w-10 h-10 rounded-full bg-[#00f0ff]/10 flex items-center justify-center text-[#00f0ff] hover:bg-[#00f0ff]/20 transition-all">
+                                            <i data-feather="twitter"></i>
+                                        </a>
+                                        <a href="#" class="w-10 h-10 rounded-full bg-[#00f0ff]/10 flex items-center justify-center text-[#00f0ff] hover:bg-[#00f0ff]/20 transition-all">
+                                            <i data-feather="instagram"></i>
+                                        </a>
+                                        <a href="#" class="w-10 h-10 rounded-full bg-[#00f0ff]/10 flex items-center justify-center text-[#00f0ff] hover:bg-[#00f0ff]/20 transition-all">
+                                            <i data-feather="facebook"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-2xl font-bold gradient-text mb-6">Send a Message</h3>
+                                <form id="contact-form" class="space-y-4">
+                                    <div>
+                                        <label for="name" class="block text-sm font-medium mb-1">Name</label>
+                                        <input type="text" id="name" name="name" required class="w-full bg-[#1a1a3a] border border-[#00f0ff]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00f0ff] focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label for="email" class="block text-sm font-medium mb-1">Email</label>
+                                        <input type="email" id="email" name="email" required class="w-full bg-[#1a1a3a] border border-[#00f0ff]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00f0ff] focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label for="subject" class="block text-sm font-medium mb-1">Subject</label>
+                                        <input type="text" id="subject" name="subject" required class="w-full bg-[#1a1a3a] border border-[#00f0ff]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00f0ff] focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label for="message" class="block text-sm font-medium mb-1">Message</label>
+                                        <textarea id="message" name="message" rows="4" required class="w-full bg-[#1a1a3a] border border-[#00f0ff]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00f0ff] focus:border-transparent"></textarea>
+                                    </div>
+                                    <button type="submit" class="w-full bg-gradient-to-r from-[#00f0ff] to-[#7b2cbf] text-[#0a0a1a] px-6 py-3 rounded-lg font-bold hover:shadow-lg hover:shadow-[#00f0ff]/30 transition-all">
+                                        Send Message
+                                    </button>
+                                </form>
+                                <div id="form-status" class="mt-4 text-center hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Links -->
+                    <div class="mt-16 flex justify-center space-x-6">
+                        <a href="https://github.com/akshatgupta-dev" target="_blank" class="social-icon">
+                            <i data-feather="github" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/akshatgupta01" target="_blank" class="social-icon">
+                            <i data-feather="linkedin" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                        <a href="mailto:gupta.akshat2005@gmail.com" class="social-icon">
+                            <i data-feather="mail" class="w-6 h-6 text-white hover:text-[#00f0ff] transition-colors"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="mt-12 text-center text-sm text-[#a0a0ff]">
+                        &copy; <span id="current-year"></span> Akshat Gupta. All rights reserved.
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Vanta.js backgrounds for each page
+    let vantaEffects = {
+        home: VANTA.NET({
+            el: "#vanta-home",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x00f0ff,
+            backgroundColor: 0x0a0a1a,
+            points: 12.00,
+            maxDistance: 22.00,
+            spacing: 18.00
+        }),
+        about: VANTA.DOTS({
+            el: "#vanta-about",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x00f0ff,
+            backgroundColor: 0x0a0a1a,
+            color2: 0x7b2cbf,
+            size: 3.50,
+            spacing: 30.00,
+            showLines: false
+        }),
+        projects: VANTA.GLOBE({
+            el: "#vanta-projects",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x00f0ff,
+            backgroundColor: 0x0a0a1a,
+            color2: 0x7b2cbf,
+            size: 0.80
+        }),
+        
+        contact: VANTA.FOG({
+            el: "#vanta-contact",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            highlightColor: 0x00f0ff,
+            midtoneColor: 0x7b2cbf,
+            lowlightColor: 0x0a0a1a,
+            baseColor: 0x0a0a1a,
+            blurFactor: 0.50,
+            speed: 1.50
+        })
+    };
+
+        // Initialize Feather Icons
+        feather.replace();
+    
+        // Hide loading screen
+        window.addEventListener("load", function () {
+            setTimeout(function() {
+                document.getElementById("loading-screen").style.opacity = "0";
+                setTimeout(function() {
+                    document.getElementById("loading-screen").style.display = "none";
+                }, 500);
+            }, 1000);
+        });
+    
+        // Terminal typing animation
+        const terminalContent = document.getElementById("terminal-content");
+        const commands = [
+            { text: "$ whoami", delay: 500 },
+            { text: "AI Innovator | Machine Learning Engineer | Data Scientist", delay: 1000, isResponse: true },
+            { text: "$ cat about.txt", delay: 1500 },
+            { text: "Passionate about transforming complex challenges into intelligent solutions through cutting-edge AI and machine learning technologies", delay: 2000, isResponse: true },
+            { text: "$ _", delay: 2500, cursor: true }
+        ];
+        
+        function typeWriter(text, element, delay, isResponse, cursor) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const line = document.createElement("p");
+                    if (isResponse) {
+                        line.className = "response";
+                    } else {
+                        line.className = "command";
+                    }
+                    element.appendChild(line);
+                    
+                    let i = 0;
+                    const typing = setInterval(() => {
+                        if (i < text.length) {
+                            line.textContent += text.charAt(i);
+                            i++;
+                        } else {
+                            clearInterval(typing);
+                            if (cursor) {
+                                const cursorSpan = document.createElement("span");
+                                cursorSpan.className = "cursor";
+                                line.appendChild(cursorSpan);
+                            }
+                            resolve();
+                        }
+                    }, 30);
+                }, delay);
+            });
+        }
+        
+        async function runTerminal() {
+            for (const cmd of commands) {
+                await typeWriter(cmd.text, terminalContent, cmd.delay, cmd.isResponse || false, cmd.cursor || false);
+            }
+        }
+        
+        runTerminal();
+    
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const closeMobileMenu = document.getElementById("close-mobile-menu");
+        
+        mobileMenuButton.addEventListener("click", () => {
+            mobileMenu.classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+            feather.replace();
+        });
+        
+        closeMobileMenu.addEventListener("click", () => {
+            mobileMenu.classList.add("hidden");
+            document.body.style.overflow = "";
+        });
+        
+        // Close mobile menu when clicking on links
+        document.querySelectorAll("#mobile-menu a").forEach(link => {
+            link.addEventListener("click", () => {
+                mobileMenu.classList.add("hidden");
+                document.body.style.overflow = "";
+            });
+        });
+    
+        // Update year in footer
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+    
+        // Page navigation system
+        const pages = {
+            'home': document.getElementById('home-page'),
+            'about': document.getElementById('about-page'),
+            'projects': document.getElementById('projects-page'),
+            'skills': document.getElementById('skills-page'),
+            'contact': document.getElementById('contact-page')
+        };
+        
+        let currentPage = 'home';
+        
+        function navigateTo(pageId) {
+            if (pageId === currentPage) return;
+            
+            // Hide current page
+            pages[currentPage].classList.remove('active');
+            
+            // Show new page
+            pages[pageId].classList.add('active');
+            
+            // Update current page
+            currentPage = pageId;
+            
+            // Update URL hash
+            window.location.hash = pageId;
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${pageId}`) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Scroll to top of new page
+            pages[pageId].scrollTop = 0;
+            
+            // Resize Vanta.js effect for the new page
+            if (vantaEffects[pageId]) {
+                setTimeout(() => {
+                    vantaEffects[pageId].resize();
+                }, 100);
+            }
+        }
+        
+        // Initialize page navigation
+        document.querySelectorAll('.nav-link, .page-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetPage = this.getAttribute('href').substring(1);
+                navigateTo(targetPage);
+            });
+        });
+        
+        // Handle initial page load with hash
+        if (window.location.hash) {
+            const pageId = window.location.hash.substring(1);
+            if (pages[pageId]) {
+                navigateTo(pageId);
+            }
+        }
+        
+        // Handle browser back/forward navigation
+        window.addEventListener('hashchange', function() {
+            const pageId = window.location.hash.substring(1);
+            if (pages[pageId] && pageId !== currentPage) {
+                navigateTo(pageId);
+            }
+        });
+        
+        // Contact form submission
+        const contactForm = document.getElementById('contact-form');
+        const formStatus = document.getElementById('form-status');
+        
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulate form submission
+            formStatus.textContent = 'Message sent successfully!';
+            formStatus.className = 'text-green-400';
+            formStatus.classList.remove('hidden');
+            
+            // Reset form
+            contactForm.reset();
+            
+            // Hide status after 3 seconds
+            setTimeout(() => {
+                formStatus.classList.add('hidden');
+            }, 3000);
+        });
+        
+        // GSAP animations for page content
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Animate sections on scroll for each page
+        Object.values(pages).forEach(page => {
+            gsap.utils.toArray(page.querySelectorAll(".section")).forEach((section, index) => {
+                if (index > 0) { // Skip first section
+                    gsap.from(section, {
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 80%",
+                            toggleActions: "play none none none"
+                        },
+                        opacity: 0,
+                        y: 50,
+                        duration: 0.8,
+                        ease: "power3.out"
+                    });
+                }
+            });
+            
+            // Animate project cards
+            gsap.utils.toArray(page.querySelectorAll(".project-card")).forEach((card, index) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 80%",
+                        toggleActions: "play none none none"
+                    },
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    ease: "power3.out"
+                });
+            });
+            
+            // Animate skill bars
+            gsap.utils.toArray(page.querySelectorAll(".skill-progress")).forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = "0";
+                
+                ScrollTrigger.create({
+                    trigger: bar,
+                    start: "top 80%",
+                    onEnter: () => {
+                        gsap.to(bar, {
+                            width: width,
+                            duration: 1.5,
+                            ease: "power3.out"
+                        });
+                    }
+                });
+            });
+        });
+        
+        // Resize Vanta effects when window resizes
+        window.addEventListener('resize', function() {
+            Object.values(vantaEffects).forEach(effect => {
+                if (effect) effect.resize();
+            });
+        });
+    });
+    </script>
+</body>
+</html>
